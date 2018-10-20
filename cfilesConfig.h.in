@@ -1,0 +1,4 @@
+/* Configured options and settings for cFiles */
+
+#define CFILES_VERSION_MAJOR @CFILES_VERSION_MAJOR@
+#define CFILES_VERSION_MINOR @CFILES_VERSION_MINOR@
