@@ -1,5 +1,5 @@
 /*******************************************************************************
- * main.c : entry point for the main program loop
+ * ui.h : functions for UI display and interaction
  *******************************************************************************
  * cFiles - A basic ncurses file browser
  * Copyright (C) 2018 Jalen Adams
@@ -20,22 +20,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "ui.h"
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <ncurses.h>
 
-int main()
-{
-    struct ui *ui = setup_ui();
+struct ui {
+    WINDOW *main_window;
+    WINDOW *main_window_sub;
+};
 
-    int ch = 0;
-    while (ch != 'q')
-        ch = getch();
+struct ui *setup_ui();
+void setup_ncurses();
+void setup_main_window(struct ui *ui);
 
-    teardown_ui(ui);
-
-    return 0;
-}
+void teardown_ui(struct ui *ui);
+void teardown_main_window(struct ui *ui);

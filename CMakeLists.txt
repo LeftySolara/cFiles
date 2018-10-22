@@ -24,6 +24,7 @@ include_directories("${PROJECT_BINARY_DIR}")
 
 # Find the source files
 set(SOURCE_FILES
+  src/ui.c
   src/main.c
   )
 
