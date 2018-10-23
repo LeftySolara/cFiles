@@ -25,6 +25,9 @@
 struct ui {
     WINDOW *main_window;
     WINDOW *main_window_sub;
+
+    char *cwd;
+    const int color_enabled;
 };
 
 struct ui *setup_ui();
@@ -33,3 +36,7 @@ void setup_main_window(struct ui *ui);
 
 void teardown_ui(struct ui *ui);
 void teardown_main_window(struct ui *ui);
+
+void refresh_ui(struct ui *ui);
+
+void print_cwd(struct ui *ui);

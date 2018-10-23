@@ -25,11 +25,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <ncurses.h>
+
+#define MAX_PATH_LENGTH 4096
 
 int main()
 {
     struct ui *ui = setup_ui();
+    getcwd(ui->cwd, MAX_PATH_LENGTH);
+
+    print_cwd(ui);
+    refresh_ui(ui);
 
     int ch = 0;
     while (ch != 'q')

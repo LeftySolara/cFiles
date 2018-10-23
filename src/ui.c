@@ -25,11 +25,17 @@
 #include <stdlib.h>
 #include <locale.h>
 
+#define MAX_PATH_LENGTH 4096
+
 struct ui *setup_ui()
 {
-    struct ui *ui = malloc(sizeof(struct ui));
-
     setup_ncurses();
+
+    struct ui *ui = malloc(sizeof(struct ui));
+    ui->cwd = malloc(sizeof(char) * MAX_PATH_LENGTH);
+
+    *(int *)&ui->color_enabled = has_colors();
+
     setup_main_window(ui);
 
     return ui;
@@ -39,11 +45,14 @@ void setup_ncurses()
 {
     setlocale(LC_ALL, "");
     initscr();
-    start_color();
     cbreak();
     noecho();
     curs_set(0);
     keypad(stdscr, TRUE);
+
+    start_color();
+    init_pair(1, COLOR_CYAN, COLOR_BLACK);
+
     refresh();
 }
 
@@ -57,21 +66,19 @@ void setup_main_window(struct ui *ui)
 
     /* Add borders for whole window and add box for file path display. */
     box(ui->main_window, 0, 0);
-    mvwaddstr(ui->main_window, 1, 2, "Example/File/Path");
     mvwaddch(ui->main_window, 2, 0, ACS_LTEE);
     mvwhline(ui->main_window, 2, 1, ACS_HLINE, maxx - 2);
     mvwaddch(ui->main_window, 2, maxx - 1, ACS_RTEE);
 
-    wnoutrefresh(ui->main_window);
-    touchwin(ui->main_window_sub);
-    wnoutrefresh(ui->main_window_sub);
-    doupdate();
+    refresh_ui(ui);
 }
 
 void teardown_ui(struct ui *ui)
 {
     endwin();
     teardown_main_window(ui);
+
+    free(ui->cwd);
     free(ui);
 }
 
@@ -81,3 +88,24 @@ void teardown_main_window(struct ui *ui)
     delwin(ui->main_window);
 }
 
+void refresh_ui(struct ui *ui)
+{
+    wnoutrefresh(ui->main_window);
+    touchwin(ui->main_window_sub);
+    wnoutrefresh(ui->main_window_sub);
+    doupdate();
+}
+
+void print_cwd(struct ui *ui)
+{
+    if (ui->color_enabled)
+        wattron(ui->main_window, COLOR_PAIR(1));
+
+    wattron(ui->main_window, A_BOLD);
+    mvwaddstr(ui->main_window, 1, 2, ui->cwd);
+    wattroff(ui->main_window, A_BOLD);
+
+    if (ui->color_enabled)
+        wattroff(ui->main_window, COLOR_PAIR(1));
+
+}
