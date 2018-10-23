@@ -33,6 +33,7 @@ struct ui *setup_ui()
 
     struct ui *ui = malloc(sizeof(struct ui));
     ui->cwd = malloc(sizeof(char) * MAX_PATH_LENGTH);
+    ui->menu = setup_menu();
 
     *(int *)&ui->color_enabled = has_colors();
 
@@ -77,6 +78,7 @@ void teardown_ui(struct ui *ui)
 {
     endwin();
     teardown_main_window(ui);
+    teardown_menu(ui->menu);
 
     free(ui->cwd);
     free(ui);
@@ -107,5 +109,12 @@ void print_cwd(struct ui *ui)
 
     if (ui->color_enabled)
         wattroff(ui->main_window, COLOR_PAIR(1));
+}
 
+void print_menu(struct ui *ui)
+{
+    WINDOW *target_win = ui->main_window_sub;
+
+    for (int i = 0; i < ui->menu->num_items; ++i)
+        mvwaddstr(target_win, i, 0, ui->menu->items[i]->display_text);
 }

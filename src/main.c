@@ -35,7 +35,13 @@ int main()
     struct ui *ui = setup_ui();
     getcwd(ui->cwd, MAX_PATH_LENGTH);
 
+    menu_append(ui->menu, "test 1", COLOR_BLACK, COLOR_CYAN, 0);
+    menu_append(ui->menu, "test 2", COLOR_BLACK, COLOR_CYAN, 0);
+    menu_append(ui->menu, "test 3", COLOR_BLACK, COLOR_CYAN, 0);
+    menu_append(ui->menu, "test 4", COLOR_BLACK, COLOR_CYAN, 0);
+
     print_cwd(ui);
+    print_menu(ui);
     refresh_ui(ui);
 
     int ch = 0;

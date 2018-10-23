@@ -1,5 +1,5 @@
 /*******************************************************************************
- * ui.h : functions for UI display and interaction
+ * ui_menu.h : functions for menu interaction
  *******************************************************************************
  * cFiles - A basic ncurses file browser
  * Copyright (C) 2018 Jalen Adams
@@ -20,31 +20,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#ifndef UI_H
-#define UI_H
+#ifndef UI_MENU_H
+#define UI_MENU_H
 
-#include <ncurses.h>
-#include "ui_menu.h"
-
-struct ui {
-    WINDOW *main_window;
-    WINDOW *main_window_sub;
-    struct menu *menu;
-
-    char *cwd;
-    const int color_enabled;
+struct menu_item {
+    char *display_text;
+    short color_back;
+    short color_fore;
+    int is_bold;
 };
 
-struct ui *setup_ui();
-void setup_ncurses();
-void setup_main_window(struct ui *ui);
+struct menu {
+    struct menu_item **items;
+    unsigned int idx_selected;
+    unsigned int num_items;
+    unsigned int max_items;
+};
 
-void teardown_ui(struct ui *ui);
-void teardown_main_window(struct ui *ui);
+struct menu *setup_menu();
+struct menu_item *setup_menu_item(const char *text, short background,
+                                 short foreground, int bold);
 
-void refresh_ui(struct ui *ui);
+void teardown_menu(struct menu *menu);
+void teardown_menu_item(struct menu_item *item);
 
-void print_cwd(struct ui *ui);
-void print_menu(struct ui *ui);
+void menu_append(struct menu *menu,const char *text,
+                 short background, short foreground, int bold);
 
-#endif /* UI_H */
+#endif /* UI_MENU_H */
