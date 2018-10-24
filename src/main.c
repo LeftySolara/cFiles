@@ -26,6 +26,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <dirent.h>
 #include <ncurses.h>
 
 #define MAX_PATH_LENGTH 4096
@@ -35,10 +36,11 @@ int main()
     struct ui *ui = setup_ui();
     getcwd(ui->cwd, MAX_PATH_LENGTH);
 
-    menu_append(ui->menu, "test 1", COLOR_BLACK, COLOR_CYAN, 0);
-    menu_append(ui->menu, "test 2", COLOR_BLACK, COLOR_CYAN, 0);
-    menu_append(ui->menu, "test 3", COLOR_BLACK, COLOR_CYAN, 0);
-    menu_append(ui->menu, "test 4", COLOR_BLACK, COLOR_CYAN, 0);
+    struct dirent **dir_entries;
+    int dir_count = scandir(ui->cwd, &dir_entries, NULL, alphasort);
+
+    for (int i = 0; i < dir_count; ++i)
+        menu_append(ui->menu, dir_entries[i]->d_name, COLOR_BLACK, COLOR_WHITE, FALSE);
 
     print_cwd(ui);
     print_menu(ui);

@@ -153,8 +153,16 @@ void print_menu(struct ui *ui)
 {
     WINDOW *target_win = ui->main_window_sub;
 
-    for (int i = 0; i < ui->menu->num_items; ++i)
+    for (int i = 0; i < ui->menu->num_items; ++i) {
+
+        if (i == ui->menu->idx_selected)
+            wattr_on(target_win, A_STANDOUT, NULL);
+
         mvwaddstr(target_win, i, 0, ui->menu->items[i]->display_text);
+
+        if (i == ui->menu->idx_selected)
+            wattr_off(target_win, A_STANDOUT, NULL);
+    }
 }
 
 void menu_append(struct menu *menu, const char *text,

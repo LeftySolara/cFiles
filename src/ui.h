@@ -40,7 +40,7 @@ struct menu_item {
 
 struct menu {
     struct menu_item **items;
-    unsigned int idx_selected;
+    int idx_selected;
     unsigned int num_items;
     unsigned int max_items;
 };
