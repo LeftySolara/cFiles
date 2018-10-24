@@ -42,6 +42,29 @@ struct ui *setup_ui()
     return ui;
 }
 
+struct menu *setup_menu()
+{
+    struct menu *menu = malloc(sizeof(struct menu));
+    menu->items = calloc(255, sizeof(struct menu_item));
+    menu->idx_selected = -1;  /* no item selected */
+    menu->num_items = 0;
+    menu->max_items = 255;
+
+    return menu;
+}
+
+struct menu_item *setup_menu_item(const char *text, short background,
+                                  short foreground, int bold)
+{
+    struct menu_item *item = malloc(sizeof(struct menu_item));
+    item->display_text = text;
+    item->color_back = background;
+    item->color_fore = foreground;
+    item->is_bold = bold;
+
+    return item;
+}
+
 void setup_ncurses()
 {
     setlocale(LC_ALL, "");
@@ -84,6 +107,19 @@ void teardown_ui(struct ui *ui)
     free(ui);
 }
 
+void teardown_menu(struct menu *menu)
+{
+    for (int i = 0; i < menu->num_items; ++i)
+        teardown_menu_item(menu->items[i]);
+
+    free(menu);
+}
+
+void teardown_menu_item(struct menu_item *item)
+{
+    free(item);
+}
+
 void teardown_main_window(struct ui *ui)
 {
     delwin(ui->main_window_sub);
@@ -117,4 +153,21 @@ void print_menu(struct ui *ui)
 
     for (int i = 0; i < ui->menu->num_items; ++i)
         mvwaddstr(target_win, i, 0, ui->menu->items[i]->display_text);
+}
+
+void menu_append(struct menu *menu, const char *text,
+                 short background, short foreground, int bold)
+{
+    int new_max_size;
+    if (menu->num_items == menu->max_items) {
+        new_max_size = menu->num_items * 2;
+        menu->items = realloc(menu->items, sizeof(struct menu_item) * new_max_size);
+        menu->max_items = new_max_size;
+    }
+
+    struct menu_item *item = setup_menu_item(text, background, foreground, bold);
+    menu->items[menu->num_items++] = item;
+
+    if (menu->idx_selected < 0)
+        menu->idx_selected = 0;
 }

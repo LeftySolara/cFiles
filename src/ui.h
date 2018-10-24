@@ -24,7 +24,20 @@
 #define UI_H
 
 #include <ncurses.h>
-#include "ui_menu.h"
+
+struct menu_item {
+    char *display_text;
+    short color_back;
+    short color_fore;
+    int is_bold;
+};
+
+struct menu {
+    struct menu_item **items;
+    unsigned int idx_selected;
+    unsigned int num_items;
+    unsigned int max_items;
+};
 
 struct ui {
     WINDOW *main_window;
@@ -36,15 +49,23 @@ struct ui {
 };
 
 struct ui *setup_ui();
+struct menu *setup_menu();
+struct menu_item *setup_menu_item(const char *text, short background, short foreground, int bold);
+
 void setup_ncurses();
 void setup_main_window(struct ui *ui);
 
 void teardown_ui(struct ui *ui);
+void teardown_menu(struct menu *menu);
+void teardown_menu_item(struct menu_item *item);
 void teardown_main_window(struct ui *ui);
 
 void refresh_ui(struct ui *ui);
 
 void print_cwd(struct ui *ui);
 void print_menu(struct ui *ui);
+
+void menu_append(struct menu *menu,const char *text,
+                 short background, short foreground, int bold);
 
 #endif /* UI_H */
