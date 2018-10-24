@@ -25,6 +25,12 @@
 
 #include <ncurses.h>
 
+enum color_pair {
+    PAIR_CWD = 1,
+    PAIR_EXECUTABLE,
+    PAIR_SYMLINK,
+};
+
 struct menu_item {
     char *display_text;
     short color_back;

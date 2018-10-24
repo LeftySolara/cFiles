@@ -75,7 +75,9 @@ void setup_ncurses()
     keypad(stdscr, TRUE);
 
     start_color();
-    init_pair(1, COLOR_CYAN, COLOR_BLACK);
+    init_pair(PAIR_CWD, COLOR_CYAN, COLOR_BLACK);
+    init_pair(PAIR_EXECUTABLE, COLOR_RED, COLOR_BLACK);
+    init_pair(PAIR_SYMLINK, COLOR_GREEN, COLOR_BLACK);
 
     refresh();
 }
@@ -137,14 +139,14 @@ void refresh_ui(struct ui *ui)
 void print_cwd(struct ui *ui)
 {
     if (ui->color_enabled)
-        wattron(ui->main_window, COLOR_PAIR(1));
+        wattron(ui->main_window, COLOR_PAIR(PAIR_CWD));
 
     wattron(ui->main_window, A_BOLD);
     mvwaddstr(ui->main_window, 1, 2, ui->cwd);
     wattroff(ui->main_window, A_BOLD);
 
     if (ui->color_enabled)
-        wattroff(ui->main_window, COLOR_PAIR(1));
+        wattroff(ui->main_window, COLOR_PAIR(PAIR_CWD));
 }
 
 void print_menu(struct ui *ui)
