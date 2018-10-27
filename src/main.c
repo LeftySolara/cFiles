@@ -52,6 +52,7 @@ int main()
     while (cmd != CMD_QUIT) {
         ch = getch();
         cmd = find_command(ch);
+        execute_command(cmd, ui);
 
         refresh_ui(ui);
     }

@@ -49,6 +49,7 @@ struct menu *setup_menu()
     menu->idx_selected = -1;  /* no item selected */
     menu->num_items = 0;
     menu->max_items = 255;
+    menu->changed = 1;
 
     return menu;
 }
@@ -130,6 +131,11 @@ void teardown_main_window(struct ui *ui)
 
 void refresh_ui(struct ui *ui)
 {
+    if (ui->menu->changed) {
+        print_menu(ui);
+        ui->menu->changed = 0;
+    }
+    
     wnoutrefresh(ui->main_window);
     touchwin(ui->main_window_sub);
     wnoutrefresh(ui->main_window_sub);
@@ -165,6 +171,24 @@ void print_menu(struct ui *ui)
     }
 }
 
+void menu_select_prev(struct menu *menu)
+{
+    if (menu->idx_selected <= 0)
+        return;
+
+    menu->idx_selected -= 1;
+    menu->changed = 1;
+}
+
+void menu_select_next(struct menu *menu)
+{
+    if (menu->idx_selected == (menu->num_items - 1))
+        return;
+
+    menu->idx_selected += 1;
+    menu->changed = 1;
+}
+
 void menu_append(struct menu *menu, const char *text,
                  short background, short foreground, int bold)
 {
@@ -180,4 +204,6 @@ void menu_append(struct menu *menu, const char *text,
 
     if (menu->idx_selected < 0)
         menu->idx_selected = 0;
+
+    menu->changed = 1;
 }
