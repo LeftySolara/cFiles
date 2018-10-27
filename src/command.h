@@ -1,5 +1,5 @@
 /*******************************************************************************
- * main.c : entry point for the main program loop
+ * command.h : interface for executing user commands
  *******************************************************************************
  * cFiles - A basic ncurses file browser
  * Copyright (C) 2018 Jalen Adams
@@ -20,43 +20,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "ui.h"
-#include "command.h"
+#ifndef COMMAND_H
+#define COMMAND_H
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <ncurses.h>
+#define MAX_KEYS 3 /* Number of keys that can be mapped to a command. */
 
-#define MAX_PATH_LENGTH 4096
+enum command_type {
+    CMD_NONE,
+    CMD_QUIT,
+    NUM_CMDS
+};
 
-int main()
-{
-    struct ui *ui = setup_ui();
-    getcwd(ui->cwd, MAX_PATH_LENGTH);
+struct command {
+    enum command_type type;
+    int keys[MAX_KEYS];
+};
 
-    struct dirent **dir_entries;
-    int dir_count = scandir(ui->cwd, &dir_entries, NULL, alphasort);
+enum command_type find_command(int key);
+int execute_command(enum command_type cmd_type);
 
-    for (int i = 0; i < dir_count; ++i)
-        menu_append(ui->menu, dir_entries[i]->d_name, COLOR_BLACK, COLOR_WHITE, FALSE);
-
-    print_cwd(ui);
-    print_menu(ui);
-    refresh_ui(ui);
-
-    int ch = 0;
-    enum command_type cmd = CMD_NONE;
-    while (cmd != CMD_QUIT) {
-        ch = getch();
-        cmd = find_command(ch);
-
-        refresh_ui(ui);
-    }
-
-    teardown_ui(ui);
-
-    return 0;
-}
+#endif /* COMMAND_H */
