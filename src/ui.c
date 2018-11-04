@@ -21,18 +21,17 @@
  ******************************************************************************/
 
 #include "ui.h"
+#include "filesystem.h"
 
 #include <stdlib.h>
 #include <locale.h>
-
-#define MAX_PATH_LENGTH 4096
 
 struct ui *setup_ui()
 {
     setup_ncurses();
 
     struct ui *ui = malloc(sizeof(struct ui));
-    ui->cwd = malloc(sizeof(char) * MAX_PATH_LENGTH);
+    ui->cwd = get_cwd_path(ui->cwd);
     ui->menu = setup_menu();
 
     *(int *)&ui->color_enabled = has_colors();

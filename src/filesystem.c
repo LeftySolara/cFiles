@@ -1,5 +1,5 @@
 /*******************************************************************************
- * main.c : entry point for the main program loop
+ * filesystem.h : functions for filesystem interaction
  *******************************************************************************
  * cFiles - A basic ncurses file browser
  * Copyright (C) 2018 Jalen Adams
@@ -20,40 +20,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "ui.h"
-#include "command.h"
 #include "filesystem.h"
-
-#include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <dirent.h>
-#include <ncurses.h>
 
-int main()
+static const int max_path_length = 4096;
+
+struct directory *get_dir(char *path)
 {
-    struct ui *ui = setup_ui();
-    struct directory *cwd = get_dir(ui->cwd);
+    struct directory *directory = malloc(sizeof(struct directory));
+    directory->num_entries = scandir(path, &directory->entries, NULL, alphasort);
+    directory->path = path;
 
-    for (int i = 0; i < cwd->num_entries; ++i)
-        menu_append(ui->menu, cwd->entries[i]->d_name, COLOR_BLACK, COLOR_WHITE, FALSE);
+    return directory;
+}
 
-    print_cwd(ui);
-    print_menu(ui);
-    refresh_ui(ui);
+void free_dir(struct directory *directory)
+{
+    free(directory->entries);
+    free(directory);
+}
 
-    int ch = 0;
-    enum command_type cmd = CMD_NONE;
-    while (cmd != CMD_QUIT) {
-        ch = getch();
-        cmd = find_command(ch);
-        execute_command(cmd, ui);
+char *get_cwd_path(char *buffer)
+{
+    buffer = realloc(buffer, sizeof(char) * max_path_length);
+    getcwd(buffer, max_path_length);
 
-        refresh_ui(ui);
-    }
-
-    teardown_ui(ui);
-
-    return 0;
+    return buffer;
 }

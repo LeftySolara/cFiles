@@ -1,5 +1,5 @@
 /*******************************************************************************
- * main.c : entry point for the main program loop
+ * filesystem.h : functions for filesystem interaction
  *******************************************************************************
  * cFiles - A basic ncurses file browser
  * Copyright (C) 2018 Jalen Adams
@@ -20,40 +20,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-#include "ui.h"
-#include "command.h"
-#include "filesystem.h"
+#ifndef FILESYSTEM_H
+#define FILESYSTEM_H
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <dirent.h>
-#include <ncurses.h>
 
-int main()
-{
-    struct ui *ui = setup_ui();
-    struct directory *cwd = get_dir(ui->cwd);
+struct directory {
+    char *path;
+    int num_entries;
+    struct dirent **entries;
+};
 
-    for (int i = 0; i < cwd->num_entries; ++i)
-        menu_append(ui->menu, cwd->entries[i]->d_name, COLOR_BLACK, COLOR_WHITE, FALSE);
+struct directory *get_dir(char *path);
+void free_dir(struct directory *directory);
 
-    print_cwd(ui);
-    print_menu(ui);
-    refresh_ui(ui);
+char *get_cwd_path(char *buffer);
 
-    int ch = 0;
-    enum command_type cmd = CMD_NONE;
-    while (cmd != CMD_QUIT) {
-        ch = getch();
-        cmd = find_command(ch);
-        execute_command(cmd, ui);
-
-        refresh_ui(ui);
-    }
-
-    teardown_ui(ui);
-
-    return 0;
-}
+#endif /* FILESYSTEM_H */
