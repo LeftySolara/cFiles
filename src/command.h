@@ -29,8 +29,8 @@
 
 enum command_type {
     CMD_NONE,
-    CMD_SELECT_PREV,
-    CMD_SELECT_NEXT,
+    CMD_MENU_MOVE_UP,
+    CMD_MENU_MOVE_DOWN,
     CMD_QUIT,
     NUM_CMDS
 };

@@ -28,8 +28,8 @@
 static struct command cmds[] = {
 
     {CMD_NONE, {0, 0, 0}},
-    {CMD_SELECT_PREV, {'k', KEY_UP, 0}},
-    {CMD_SELECT_NEXT, {'j', KEY_DOWN, 0}},
+    {CMD_MENU_MOVE_UP, {'k', KEY_UP, 0}},
+    {CMD_MENU_MOVE_DOWN, {'j', KEY_DOWN, 0}},
     {CMD_QUIT, {'q', KEY_CTRL('c'), 0}},
 };
 
@@ -54,11 +54,11 @@ int execute_command(enum command_type cmd_type, struct ui *ui)
     switch(cmd_type) {
     case CMD_NONE:
         break;
-    case CMD_SELECT_PREV:
-        menu_select_prev(ui->menu);
+    case CMD_MENU_MOVE_UP:
+        menu_move_up(ui->menu);
         break;
-    case CMD_SELECT_NEXT:
-        menu_select_next(ui->menu);
+    case CMD_MENU_MOVE_DOWN:
+        menu_move_down(ui->menu);
         break;
     default:
         break;

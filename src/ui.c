@@ -170,7 +170,7 @@ void print_menu(struct ui *ui)
     }
 }
 
-void menu_select_prev(struct menu *menu)
+void menu_move_up(struct menu *menu)
 {
     if (menu->idx_selected <= 0)
         return;
@@ -179,7 +179,7 @@ void menu_select_prev(struct menu *menu)
     menu->changed = 1;
 }
 
-void menu_select_next(struct menu *menu)
+void menu_move_down(struct menu *menu)
 {
     if (menu->idx_selected == (menu->num_items - 1))
         return;

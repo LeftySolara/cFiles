@@ -67,14 +67,13 @@ void teardown_menu(struct menu *menu);
 void teardown_menu_item(struct menu_item *item);
 void teardown_main_window(struct ui *ui);
 
-
 void refresh_ui(struct ui *ui);
 
 void print_cwd(struct ui *ui);
 void print_menu(struct ui *ui);
 
-void menu_select_prev(struct menu *menu);
-void menu_select_next(struct menu *menu);
+void menu_move_up(struct menu *menu);
+void menu_move_down(struct menu *menu);
 void menu_append(struct menu *menu,const char *text,
                  short background, short foreground, int bold);
 
