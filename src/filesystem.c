@@ -22,6 +22,7 @@
 
 #include "filesystem.h"
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 static const int max_path_length = 4096;
@@ -42,4 +43,26 @@ void free_dir(struct directory *directory)
     free(directory->entries);
     free(directory->path);
     free(directory);
+}
+
+void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui)
+{
+    unsigned entry_type = entry->d_type;
+
+    if (entry_type == DT_DIR) {
+        if (strcmp(entry->d_name, ".") == 0)
+            return;
+        else if (strcmp(entry->d_name, "..") == 0) {
+            char *last_slash = strrchr(cwd->path, '/');
+            *last_slash = '\0';
+        }
+        else {
+            strcat(cwd->path, "/");
+            strcat(cwd->path, entry->d_name);
+        }
+
+        free(cwd->entries);
+        cwd->num_entries = scandir(cwd->path, &cwd->entries, NULL, alphasort);
+        ui->menu->idx_selected = 0;
+    }
 }

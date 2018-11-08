@@ -48,7 +48,7 @@ int main()
     while (cmd != CMD_QUIT) {
         ch = getch();
         cmd = find_command(ch);
-        execute_command(cmd, ui);
+        execute_command(cmd, cwd, ui);
 
         refresh_ui(ui);
     }

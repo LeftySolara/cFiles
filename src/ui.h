@@ -23,6 +23,7 @@
 #ifndef UI_H
 #define UI_H
 
+#include "filesystem.h"
 #include <ncurses.h>
 
 enum color_pair {
@@ -75,5 +76,6 @@ void menu_move_up(struct menu *menu);
 void menu_move_down(struct menu *menu);
 void menu_append(struct menu *menu, char *text,
                  short background, short foreground, int bold);
+void menu_update_entries(struct ui *ui, struct directory *cwd);
 
 #endif /* UI_H */

@@ -24,11 +24,13 @@
 #define COMMAND_H
 
 #include "ui.h"
+#include "filesystem.h"
 
 #define MAX_KEYS 3 /* Number of keys that can be mapped to a command. */
 
 enum command_type {
     CMD_NONE,
+    CMD_MENU_SELECT,
     CMD_MENU_MOVE_UP,
     CMD_MENU_MOVE_DOWN,
     CMD_QUIT,
@@ -41,6 +43,6 @@ struct command {
 };
 
 enum command_type find_command(int key);
-int execute_command(enum command_type cmd_type, struct ui *ui);
+int execute_command(enum command_type cmd_type, struct directory *cwd, struct ui *ui);
 
 #endif /* COMMAND_H */

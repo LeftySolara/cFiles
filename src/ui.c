@@ -21,7 +21,6 @@
  ******************************************************************************/
 
 #include "ui.h"
-#include "filesystem.h"
 
 #include <stdlib.h>
 #include <locale.h>
@@ -140,6 +139,10 @@ void refresh_ui(struct ui *ui)
 
 void print_path(struct ui *ui, char *path)
 {
+    wmove(ui->main_window, 1, 2);
+    wclrtoeol(ui->main_window);
+    mvaddch(1, ui->main_window->_maxx, ACS_VLINE);
+
     if (ui->color_enabled)
         wattron(ui->main_window, COLOR_PAIR(PAIR_CWD));
 
@@ -154,6 +157,7 @@ void print_path(struct ui *ui, char *path)
 void print_menu(struct ui *ui)
 {
     WINDOW *target_win = ui->main_window_sub;
+    wclear(target_win);
 
     for (int i = 0; i < ui->menu->num_items; ++i) {
 
@@ -202,4 +206,14 @@ void menu_append(struct menu *menu, char *text,
         menu->idx_selected = 0;
 
     menu->changed = 1;
+}
+
+void menu_update_entries(struct ui *ui, struct directory *cwd)
+{
+    for (int i = 0; i < ui->menu->num_items; ++i)
+        teardown_menu_item(ui->menu->items[i]);
+    ui->menu->num_items = 0;
+
+    for (int i = 0; i < cwd->num_entries; ++i)
+        menu_append(ui->menu, cwd->entries[i]->d_name, COLOR_BLACK, COLOR_WHITE, 0);
 }

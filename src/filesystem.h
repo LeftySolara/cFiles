@@ -23,6 +23,7 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
+#include "ui.h"
 #include <dirent.h>
 
 struct directory {
@@ -34,6 +35,6 @@ struct directory {
 struct directory *get_dir(char *path);
 void free_dir(struct directory *directory);
 
-char *get_cwd_path(char *buffer);
+void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui);
 
 #endif /* FILESYSTEM_H */

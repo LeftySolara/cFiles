@@ -22,12 +22,15 @@
 
 #include "command.h"
 #include <ncurses.h>
+#include <string.h>
 
 #define KEY_CTRL(x) ((x) & 0x1f)
+#define KEY_RETURN 10  /* KEY_ENTER from ncurses doesn't seem to be working. */
 
 static struct command cmds[] = {
 
     {CMD_NONE, {0, 0, 0}},
+    {CMD_MENU_SELECT, {KEY_RETURN, 0, 0}},
     {CMD_MENU_MOVE_UP, {'k', KEY_UP, 0}},
     {CMD_MENU_MOVE_DOWN, {'j', KEY_DOWN, 0}},
     {CMD_QUIT, {'q', KEY_CTRL('c'), 0}},
@@ -48,11 +51,17 @@ enum command_type find_command(int key)
     return CMD_NONE;
 }
 
-int execute_command(enum command_type cmd_type, struct ui *ui)
+int execute_command(enum command_type cmd_type, struct directory *cwd, struct ui *ui)
 {
     unsigned rc = 0;
     switch(cmd_type) {
     case CMD_NONE:
+        break;
+    case CMD_MENU_SELECT:
+        open_entry(cwd, cwd->entries[ui->menu->idx_selected], ui);
+        menu_update_entries(ui, cwd);
+        print_path(ui, cwd->path);
+        refresh_ui(ui);
         break;
     case CMD_MENU_MOVE_UP:
         menu_move_up(ui->menu);
