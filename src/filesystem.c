@@ -29,8 +29,10 @@ static const int max_path_length = 4096;
 struct directory *get_dir(char *path)
 {
     struct directory *directory = malloc(sizeof(struct directory));
+    directory->path = malloc(sizeof(char) * max_path_length);
+
     directory->num_entries = scandir(path, &directory->entries, NULL, alphasort);
-    directory->path = path;
+    getcwd(directory->path, max_path_length);
 
     return directory;
 }
@@ -38,13 +40,6 @@ struct directory *get_dir(char *path)
 void free_dir(struct directory *directory)
 {
     free(directory->entries);
+    free(directory->path);
     free(directory);
-}
-
-char *get_cwd_path(char *buffer)
-{
-    buffer = realloc(buffer, sizeof(char) * max_path_length);
-    getcwd(buffer, max_path_length);
-
-    return buffer;
 }

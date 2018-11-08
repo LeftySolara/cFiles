@@ -51,7 +51,6 @@ struct ui {
     WINDOW *main_window_sub;
     struct menu *menu;
 
-    char *cwd;
     const int color_enabled;
 };
 
@@ -69,7 +68,7 @@ void teardown_main_window(struct ui *ui);
 
 void refresh_ui(struct ui *ui);
 
-void print_cwd(struct ui *ui);
+void print_path(struct ui *ui, char *path);
 void print_menu(struct ui *ui);
 
 void menu_move_up(struct menu *menu);

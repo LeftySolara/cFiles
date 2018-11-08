@@ -34,12 +34,12 @@
 int main()
 {
     struct ui *ui = setup_ui();
-    struct directory *cwd = get_dir(ui->cwd);
+    struct directory *cwd = get_dir(".");
 
     for (int i = 0; i < cwd->num_entries; ++i)
         menu_append(ui->menu, cwd->entries[i]->d_name, COLOR_BLACK, COLOR_WHITE, FALSE);
 
-    print_cwd(ui);
+    print_path(ui, cwd->path);
     print_menu(ui);
     refresh_ui(ui);
 

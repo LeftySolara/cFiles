@@ -31,10 +31,8 @@ struct ui *setup_ui()
     setup_ncurses();
 
     struct ui *ui = malloc(sizeof(struct ui));
-    ui->cwd = get_cwd_path(ui->cwd);
-    ui->menu = setup_menu();
-
     *(int *)&ui->color_enabled = has_colors();
+    ui->menu = setup_menu();
 
     setup_main_window(ui);
 
@@ -105,7 +103,6 @@ void teardown_ui(struct ui *ui)
     teardown_main_window(ui);
     teardown_menu(ui->menu);
 
-    free(ui->cwd);
     free(ui);
 }
 
@@ -141,13 +138,13 @@ void refresh_ui(struct ui *ui)
     doupdate();
 }
 
-void print_cwd(struct ui *ui)
+void print_path(struct ui *ui, char *path)
 {
     if (ui->color_enabled)
         wattron(ui->main_window, COLOR_PAIR(PAIR_CWD));
 
     wattron(ui->main_window, A_BOLD);
-    mvwaddstr(ui->main_window, 1, 2, ui->cwd);
+    mvwaddstr(ui->main_window, 1, 2, path);
     wattroff(ui->main_window, A_BOLD);
 
     if (ui->color_enabled)
