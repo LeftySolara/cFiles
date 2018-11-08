@@ -53,7 +53,7 @@ struct menu *setup_menu()
     return menu;
 }
 
-struct menu_item *setup_menu_item(const char *text, short background,
+struct menu_item *setup_menu_item(char *text, short background,
                                   short foreground, int bold)
 {
     struct menu_item *item = malloc(sizeof(struct menu_item));
@@ -188,7 +188,7 @@ void menu_move_down(struct menu *menu)
     menu->changed = 1;
 }
 
-void menu_append(struct menu *menu, const char *text,
+void menu_append(struct menu *menu, char *text,
                  short background, short foreground, int bold)
 {
     int new_max_size;

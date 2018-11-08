@@ -57,7 +57,7 @@ struct ui {
 
 struct ui *setup_ui();
 struct menu *setup_menu();
-struct menu_item *setup_menu_item(const char *text, short background, short foreground, int bold);
+struct menu_item *setup_menu_item(char *text, short background, short foreground, int bold);
 
 void setup_ncurses();
 void setup_main_window(struct ui *ui);
@@ -74,7 +74,7 @@ void print_menu(struct ui *ui);
 
 void menu_move_up(struct menu *menu);
 void menu_move_down(struct menu *menu);
-void menu_append(struct menu *menu,const char *text,
+void menu_append(struct menu *menu, char *text,
                  short background, short foreground, int bold);
 
 #endif /* UI_H */
