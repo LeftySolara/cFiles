@@ -37,7 +37,7 @@ int main()
     struct directory *cwd = get_dir(".");
 
     for (int i = 0; i < cwd->num_entries; ++i)
-        menu_append(ui->menu, cwd->entries[i]->d_name, COLOR_BLACK, COLOR_WHITE, FALSE);
+        menu_append(ui->menu, cwd->entries[i]->d_name, PAIR_NORMAL, FALSE);
 
     print_path(ui, cwd->path);
     print_menu(ui);
@@ -45,6 +45,7 @@ int main()
 
     int ch = 0;
     enum command_type cmd = CMD_NONE;
+    halfdelay(1);
     while (cmd != CMD_QUIT) {
         ch = getch();
         cmd = find_command(ch);

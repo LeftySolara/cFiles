@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <locale.h>
+#include <unistd.h>
 
 struct ui *setup_ui()
 {
@@ -51,13 +52,11 @@ struct menu *setup_menu()
     return menu;
 }
 
-struct menu_item *setup_menu_item(char *text, short background,
-                                  short foreground, int bold)
+struct menu_item *setup_menu_item(char *text, enum color_pair colors, int bold)
 {
     struct menu_item *item = malloc(sizeof(struct menu_item));
     item->display_text = text;
-    item->color_back = background;
-    item->color_fore = foreground;
+    item->colors = colors;
     item->is_bold = bold;
 
     return item;
@@ -73,9 +72,11 @@ void setup_ncurses()
     keypad(stdscr, TRUE);
 
     start_color();
+    init_pair(PAIR_NORMAL, COLOR_WHITE, COLOR_BLACK);
     init_pair(PAIR_CWD, COLOR_CYAN, COLOR_BLACK);
+    init_pair(PAIR_DIR, COLOR_BLUE, COLOR_BLACK);
     init_pair(PAIR_EXECUTABLE, COLOR_RED, COLOR_BLACK);
-    init_pair(PAIR_SYMLINK, COLOR_GREEN, COLOR_BLACK);
+    init_pair(PAIR_SYMLINK, COLOR_CYAN, COLOR_BLACK);
 
     refresh();
 }
@@ -158,15 +159,25 @@ void print_path(struct ui *ui, char *path)
 void print_menu(struct ui *ui)
 {
     WINDOW *target_win = ui->main_window_sub;
+    struct menu_item *item;
     wclear(target_win);
 
     for (int i = 0; i < ui->menu->num_items; ++i) {
+        item = ui->menu->items[i];
 
+        if (ui->color_enabled)
+            wattron(target_win, COLOR_PAIR(item->colors));
+        if (item->is_bold)
+            wattr_on(target_win, A_BOLD, NULL);
         if (i == ui->menu->idx_selected)
             wattr_on(target_win, A_STANDOUT, NULL);
 
-        mvwaddstr(target_win, i, 0, ui->menu->items[i]->display_text);
+        mvwaddstr(target_win, i, 0, item->display_text);
 
+        if (ui->color_enabled)
+            wattroff(target_win, COLOR_PAIR(item->colors));
+        if (item->is_bold)
+            wattr_off(target_win, A_BOLD, NULL);
         if (i == ui->menu->idx_selected)
             wattr_off(target_win, A_STANDOUT, NULL);
     }
@@ -190,8 +201,7 @@ void menu_move_down(struct menu *menu)
     menu->changed = 1;
 }
 
-void menu_append(struct menu *menu, char *text,
-                 short background, short foreground, int bold)
+void menu_append(struct menu *menu, char *text, enum color_pair colors, int bold)
 {
     int new_max_size;
     if (menu->num_items == menu->max_items) {
@@ -200,7 +210,7 @@ void menu_append(struct menu *menu, char *text,
         menu->max_items = new_max_size;
     }
 
-    struct menu_item *item = setup_menu_item(text, background, foreground, bold);
+    struct menu_item *item = setup_menu_item(text, colors, bold);
     menu->items[menu->num_items++] = item;
 
     if (menu->idx_selected < 0)
@@ -215,6 +225,35 @@ void menu_update_entries(struct ui *ui, struct directory *cwd)
         teardown_menu_item(ui->menu->items[i]);
     ui->menu->num_items = 0;
 
-    for (int i = 0; i < cwd->num_entries; ++i)
-        menu_append(ui->menu, cwd->entries[i]->d_name, COLOR_BLACK, COLOR_WHITE, 0);
+    struct dirent *entry;
+    int entry_type;
+    enum color_pair colors = PAIR_NORMAL;
+    int bold = 0;
+    int executable;
+
+    for (int i = 0; i < cwd->num_entries; ++i) {
+        entry = cwd->entries[i];
+        entry_type = entry->d_type;
+        executable = access(entry->d_name, X_OK);
+
+        switch (entry_type) {
+        case DT_REG:
+            bold = 0;
+            colors = (executable != 0) ? PAIR_NORMAL : PAIR_EXECUTABLE;
+            break;
+        case DT_DIR:
+            bold = 1;
+            colors = PAIR_DIR;
+            break;
+        case DT_LNK:
+            bold = 1;
+            colors = PAIR_SYMLINK;
+            break;
+        default:
+            bold = 0;
+            colors = PAIR_NORMAL;
+            break;
+        }
+        menu_append(ui->menu, entry->d_name, colors, bold);
+    }
 }

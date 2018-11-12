@@ -28,15 +28,16 @@
 struct directory;
 
 enum color_pair {
-    PAIR_CWD = 1,
+    PAIR_NORMAL = 1,
+    PAIR_CWD,
+    PAIR_DIR,
     PAIR_EXECUTABLE,
     PAIR_SYMLINK,
 };
 
 struct menu_item {
     char *display_text;
-    short color_back;
-    short color_fore;
+    enum color_pair colors;
     int is_bold;
 };
 
@@ -58,7 +59,7 @@ struct ui {
 
 struct ui *setup_ui();
 struct menu *setup_menu();
-struct menu_item *setup_menu_item(char *text, short background, short foreground, int bold);
+struct menu_item *setup_menu_item(char *text, enum color_pair colors, int bold);
 
 void setup_ncurses();
 void setup_main_window(struct ui *ui);
@@ -75,8 +76,7 @@ void print_menu(struct ui *ui);
 
 void menu_move_up(struct menu *menu);
 void menu_move_down(struct menu *menu);
-void menu_append(struct menu *menu, char *text,
-                 short background, short foreground, int bold);
+void menu_append(struct menu *menu, char *text, enum color_pair colors, int bold);
 void menu_update_entries(struct ui *ui, struct directory *cwd);
 
 #endif /* UI_H */
