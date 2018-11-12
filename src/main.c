@@ -36,9 +36,7 @@ int main()
     struct ui *ui = setup_ui();
     struct directory *cwd = get_dir(".");
 
-    for (int i = 0; i < cwd->num_entries; ++i)
-        menu_append(ui->menu, cwd->entries[i]->d_name, PAIR_NORMAL, FALSE);
-
+    menu_update_entries(ui, cwd);
     print_path(ui, cwd->path);
     print_menu(ui);
     refresh_ui(ui);
