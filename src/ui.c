@@ -21,6 +21,7 @@
  ******************************************************************************/
 
 #include "ui.h"
+#include "filesystem.h"
 
 #include <stdlib.h>
 #include <locale.h>

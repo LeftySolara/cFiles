@@ -23,8 +23,9 @@
 #ifndef UI_H
 #define UI_H
 
-#include "filesystem.h"
 #include <ncurses.h>
+
+struct directory;
 
 enum color_pair {
     PAIR_CWD = 1,
