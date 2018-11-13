@@ -61,6 +61,9 @@ void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui)
             strcat(cwd->path, entry->d_name);
         }
 
+        if (strcmp(cwd->path, "") == 0)
+            strcpy(cwd->path, "/");
+
         free(cwd->entries);
         cwd->num_entries = scandir(cwd->path, &cwd->entries, NULL, alphasort);
         ui->menu->idx_selected = 0;
