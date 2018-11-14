@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 static const int max_path_length = 4096;
 
@@ -49,6 +50,17 @@ void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui)
 {
     unsigned entry_type = entry->d_type;
 
+    if (entry_type == DT_LNK) {
+        char full_path[PATH_MAX + 1];
+
+        strcpy(full_path, cwd->path);
+        strcat(full_path, "/");
+        strcat(full_path, entry->d_name);
+
+        struct stat sb;
+        if (stat(full_path, &sb) == 0 && S_ISDIR(sb.st_mode))
+            entry_type = DT_DIR;
+    }
     if (entry_type == DT_DIR) {
         if (strcmp(entry->d_name, ".") == 0)
             return;
