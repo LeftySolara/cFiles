@@ -26,15 +26,48 @@
 #include "ui.h"
 #include <dirent.h>
 
+/*
 struct directory {
     char *path;
     int num_entries;
     struct dirent **entries;
 };
+*/
 
-struct directory *get_dir(char *path);
-void free_dir(struct directory *directory);
+struct dir_entry {
+    char *name;
+    unsigned char type;
 
-void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui);
+    int highlight;
+    int bold;
+    enum color_pair colors;
+
+    struct dir_entry *prev;
+    struct dir_entry *next;
+};
+
+struct dir_list {
+    struct dir_entry *head;
+    struct dir_entry *selected_entry;
+    int num_entries;
+    char *path;
+};
+
+
+struct dir_entry *dir_entry_init();
+struct dir_list *dir_list_init();
+
+void dir_entry_free(struct dir_entry *entry);
+void dir_list_free(struct dir_list *list);
+
+void dir_list_append(struct dir_list *list, char *name, unsigned char type, int highlight, int bold, enum color_pair colors);
+
+void get_entries(struct dir_list *list, char *path);
+unsigned char resolve_symlink_type(struct dir_entry *entry, char *path);
+
+/*struct directory *get_dir(char *path); */
+/* void free_dir(struct directory *directory); */
+
+/* void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui); */
 
 #endif /* FILESYSTEM_H */

@@ -23,11 +23,136 @@
 #include "filesystem.h"
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+#include <limits.h>
+#include <dirent.h>
+// #include <unistd.h>
 #include <sys/stat.h>
 
-static const int max_path_length = 4096;
+/* static const int max_path_length = 4096; */
 
+struct dir_entry *dir_entry_init()
+{
+    struct dir_entry *entry = malloc(sizeof(struct dir_entry));
+
+    entry->name = calloc(256, sizeof(char));
+    entry->name[0] = '\0';
+    entry->type = DT_UNKNOWN;
+
+    entry->highlight = 0;
+    entry->bold = 0;
+    entry->colors = PAIR_NORMAL;
+
+    entry->prev = NULL;
+    entry->next = NULL;
+
+    return entry;
+}
+
+struct dir_list *dir_list_init()
+{
+    struct dir_list *list = malloc(sizeof(struct dir_list));
+    list->head = NULL;
+    list->selected_entry = NULL;
+    list->num_entries = 0;
+    list->path = calloc(PATH_MAX, sizeof(char));
+    list->path[0] = '\0';
+
+    return list;
+}
+
+void dir_entry_free(struct dir_entry *entry)
+{
+    entry->prev = NULL;
+    entry->next = NULL;
+    free(entry->name);
+    free(entry);
+}
+
+void dir_list_free(struct dir_list *list)
+{
+    list->selected_entry = NULL;
+
+    struct dir_entry *current = list->head;
+    while (list->head) {
+        list->head = current->next;
+        dir_entry_free(current);
+        current = current->next;
+    }
+
+    free(list->path);
+    free(list);
+}
+
+void dir_list_append(struct dir_list *list, char *name, unsigned char type,
+                     int highlight, int bold, enum color_pair colors)
+{
+    struct dir_entry *entry = dir_entry_init();
+
+    strcpy(entry->name, name);
+    entry->type = type;
+    entry->highlight = highlight;
+    entry->bold = bold;
+    entry->colors = colors;
+
+    if (!list->head) {
+        list->head = entry;
+        list->selected_entry = list->head;
+        list->selected_entry->highlight = 1;
+    }
+    else {
+        struct dir_entry *current = list->head;
+        while (current->next)
+            current = current->next;
+        current->next = entry;
+        entry->prev = current;
+    }
+
+    ++list->num_entries;
+}
+
+void get_entries(struct dir_list *list, char *path)
+{
+    DIR *dp;
+    struct dirent *ent;
+    enum color_pair colors = PAIR_NORMAL;
+
+    if ((dp = opendir(path)) != NULL) {
+        strcpy(list->path, path);
+        while ((ent = readdir(dp)) != NULL) {
+            if (ent->d_type == DT_LNK)
+                colors = PAIR_SYMLINK;
+            else if (ent->d_type == DT_DIR)
+                colors = PAIR_DIR;
+            else
+                colors = PAIR_NORMAL;
+
+            dir_list_append(list, ent->d_name, ent->d_type, 0, 0, colors);
+        }
+        closedir(dp);
+    }
+    /* TODO: Handle directory not opening */
+}
+
+/* Determint the type of file that a symlink points to. */
+unsigned char resolve_symlink_type(struct dir_entry *entry, char *path)
+{
+    if (entry->type != DT_LNK)
+        return entry->type;
+
+    char full_path[PATH_MAX + 1];
+
+    strcpy(full_path, path);
+    strcpy(full_path, "/");
+    strcpy(full_path, entry->name);
+
+    struct stat sb;
+    if (stat(full_path, &sb) == 0 && S_ISDIR(sb.st_mode))
+        return DT_DIR;
+
+    return entry->type;
+}
+
+/*
 struct directory *get_dir(char *path)
 {
     struct directory *directory = malloc(sizeof(struct directory));
@@ -81,3 +206,5 @@ void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui)
         ui->menu->idx_selected = 0;
     }
 }
+
+*/

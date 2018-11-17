@@ -33,8 +33,11 @@
 
 int main()
 {
+    struct dir_list *directory_list = dir_list_init();
+    get_entries(directory_list, ".");
+
     struct ui *ui = setup_ui();
-    struct directory *cwd = get_dir(".");
+    /* struct directory *cwd = get_dir("."); */
 
     menu_update_entries(ui, cwd);
     print_path(ui, cwd->path);
