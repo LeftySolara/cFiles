@@ -36,13 +36,13 @@ int main()
     struct dir_list *directory_list = dir_list_init();
     get_entries(directory_list, ".");
 
-    struct ui *ui = setup_ui();
+    struct ui *ui = setup_ui(directory_list);
     /* struct directory *cwd = get_dir("."); */
 
-    menu_update_entries(ui, cwd);
-    print_path(ui, cwd->path);
-    print_menu(ui);
-    refresh_ui(ui);
+    /* menu_update_entries(ui, cwd); */
+    print_path(ui, directory_list->path);
+    print_menu(ui, directory_list);
+    refresh_ui(ui, directory_list);
 
     int ch = 0;
     enum command_type cmd = CMD_NONE;
@@ -50,9 +50,9 @@ int main()
     while (cmd != CMD_QUIT) {
         ch = getch();
         cmd = find_command(ch);
-        execute_command(cmd, cwd, ui);
+        /* execute_command(cmd, cwd, ui); */
 
-        refresh_ui(ui);
+        refresh_ui(ui, directory_list);
     }
 
     teardown_ui(ui);

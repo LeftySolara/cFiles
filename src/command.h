@@ -43,6 +43,6 @@ struct command {
 };
 
 enum command_type find_command(int key);
-int execute_command(enum command_type cmd_type, struct directory *cwd, struct ui *ui);
+int execute_command(enum command_type cmd_type, struct dir_list *dir_list, struct ui *ui);
 
 #endif /* COMMAND_H */

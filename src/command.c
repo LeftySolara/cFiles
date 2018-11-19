@@ -51,17 +51,17 @@ enum command_type find_command(int key)
     return CMD_NONE;
 }
 
-int execute_command(enum command_type cmd_type, struct directory *cwd, struct ui *ui)
+int execute_command(enum command_type cmd_type, struct dir_list *dir_list, struct ui *ui)
 {
     unsigned rc = 0;
     switch(cmd_type) {
     case CMD_NONE:
         break;
     case CMD_MENU_SELECT:
-        open_entry(cwd, cwd->entries[ui->menu->idx_selected], ui);
-        menu_update_entries(ui, cwd);
-        print_path(ui, cwd->path);
-        refresh_ui(ui);
+        /* open_entry(cwd, cwd->entries[ui->menu->idx_selected], ui); */
+        /* menu_update_entries(ui, cwd); */
+        print_path(ui, dir_list->path);
+        refresh_ui(ui, dir_list);
         break;
     case CMD_MENU_MOVE_UP:
         menu_move_up(ui->menu);

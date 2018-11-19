@@ -23,7 +23,6 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
-#include "ui.h"
 #include <dirent.h>
 
 /*
@@ -40,7 +39,7 @@ struct dir_entry {
 
     int highlight;
     int bold;
-    enum color_pair colors;
+    /* enum color_pair colors; */
 
     struct dir_entry *prev;
     struct dir_entry *next;
@@ -60,7 +59,7 @@ struct dir_list *dir_list_init();
 void dir_entry_free(struct dir_entry *entry);
 void dir_list_free(struct dir_list *list);
 
-void dir_list_append(struct dir_list *list, char *name, unsigned char type, int highlight, int bold, enum color_pair colors);
+void dir_list_append(struct dir_list *list, char *name, unsigned char type, int highlight, int bold);
 
 void get_entries(struct dir_list *list, char *path);
 unsigned char resolve_symlink_type(struct dir_entry *entry, char *path);

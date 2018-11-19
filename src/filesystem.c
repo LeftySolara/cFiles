@@ -40,7 +40,6 @@ struct dir_entry *dir_entry_init()
 
     entry->highlight = 0;
     entry->bold = 0;
-    entry->colors = PAIR_NORMAL;
 
     entry->prev = NULL;
     entry->next = NULL;
@@ -84,7 +83,7 @@ void dir_list_free(struct dir_list *list)
 }
 
 void dir_list_append(struct dir_list *list, char *name, unsigned char type,
-                     int highlight, int bold, enum color_pair colors)
+                     int highlight, int bold)
 {
     struct dir_entry *entry = dir_entry_init();
 
@@ -92,7 +91,6 @@ void dir_list_append(struct dir_list *list, char *name, unsigned char type,
     entry->type = type;
     entry->highlight = highlight;
     entry->bold = bold;
-    entry->colors = colors;
 
     if (!list->head) {
         list->head = entry;
@@ -112,21 +110,24 @@ void dir_list_append(struct dir_list *list, char *name, unsigned char type,
 
 void get_entries(struct dir_list *list, char *path)
 {
+    /* TODO: sort entries alphabetically */
     DIR *dp;
     struct dirent *ent;
-    enum color_pair colors = PAIR_NORMAL;
+    /* enum color_pair colors = PAIR_NORMAL; */
 
     if ((dp = opendir(path)) != NULL) {
         strcpy(list->path, path);
         while ((ent = readdir(dp)) != NULL) {
+            /*
             if (ent->d_type == DT_LNK)
                 colors = PAIR_SYMLINK;
             else if (ent->d_type == DT_DIR)
                 colors = PAIR_DIR;
             else
                 colors = PAIR_NORMAL;
+            */
 
-            dir_list_append(list, ent->d_name, ent->d_type, 0, 0, colors);
+            dir_list_append(list, ent->d_name, ent->d_type, 0, 0);
         }
         closedir(dp);
     }

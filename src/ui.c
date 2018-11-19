@@ -21,13 +21,12 @@
  ******************************************************************************/
 
 #include "ui.h"
-#include "filesystem.h"
 
 #include <stdlib.h>
 #include <locale.h>
 #include <unistd.h>
 
-struct ui *setup_ui()
+struct ui *setup_ui(struct dir_list *dir_list)
 {
     setup_ncurses();
 
@@ -35,7 +34,7 @@ struct ui *setup_ui()
     *(int *)&ui->color_enabled = has_colors();
     ui->menu = setup_menu();
 
-    setup_main_window(ui);
+    setup_main_window(ui, dir_list);
 
     return ui;
 }
@@ -82,7 +81,7 @@ void setup_ncurses()
 }
 
 /* Create a new fullscreen window, with a subwindow for displaying file properties. */
-void setup_main_window(struct ui *ui)
+void setup_main_window(struct ui *ui, struct dir_list *dir_list)
 {
     int maxy, maxx;
     ui->main_window = newwin(0, 0, 0, 0);
@@ -95,7 +94,7 @@ void setup_main_window(struct ui *ui)
     mvwhline(ui->main_window, 2, 1, ACS_HLINE, maxx - 2);
     mvwaddch(ui->main_window, 2, maxx - 1, ACS_RTEE);
 
-    refresh_ui(ui);
+    refresh_ui(ui, dir_list);
 }
 
 void teardown_ui(struct ui *ui)
@@ -126,11 +125,11 @@ void teardown_main_window(struct ui *ui)
     delwin(ui->main_window);
 }
 
-void refresh_ui(struct ui *ui)
+void refresh_ui(struct ui *ui, struct dir_list *dir_list)
 {
-    if (ui->menu->changed) {
-        print_menu(ui);
-        ui->menu->changed = 0;
+    if (ui->changed) {
+        print_menu(ui, dir_list);
+        ui->changed = 0;
     }
     
     wnoutrefresh(ui->main_window);
@@ -156,8 +155,33 @@ void print_path(struct ui *ui, char *path)
         wattroff(ui->main_window, COLOR_PAIR(PAIR_CWD));
 }
 
-void print_menu(struct ui *ui)
+void print_menu(struct ui *ui, struct dir_list *dir_list)
 {
+    WINDOW *target_win = ui->main_window_sub;
+    wclear(target_win);
+
+    int i = 0;
+    struct dir_entry *current = dir_list->head;
+    while (current) {
+        if (ui->color_enabled)
+            wattron(target_win, COLOR_PAIR(PAIR_NORMAL));
+        if (current->bold)
+            wattr_on(target_win, A_BOLD, NULL);
+        if (current->highlight)
+            wattr_on(target_win, A_STANDOUT, NULL);
+
+        mvwaddstr(target_win, i++, 0, current->name);
+
+        if (ui->color_enabled)
+            wattroff(target_win, COLOR_PAIR(PAIR_NORMAL));
+        if (current->bold)
+            wattr_off(target_win, A_BOLD, NULL);
+        if (current->highlight)
+            wattr_off(target_win, A_STANDOUT, NULL);
+
+        current = current->next;
+    }
+    /*
     WINDOW *target_win = ui->main_window_sub;
     struct menu_item *item;
     wclear(target_win);
@@ -181,6 +205,7 @@ void print_menu(struct ui *ui)
         if (i == ui->menu->idx_selected)
             wattr_off(target_win, A_STANDOUT, NULL);
     }
+    */
 }
 
 void menu_move_up(struct menu *menu)
@@ -225,6 +250,7 @@ void menu_update_entries(struct ui *ui, struct directory *cwd)
         teardown_menu_item(ui->menu->items[i]);
     ui->menu->num_items = 0;
 
+    /*
     struct dirent *entry;
     int entry_type;
     enum color_pair colors = PAIR_NORMAL;
@@ -256,4 +282,5 @@ void menu_update_entries(struct ui *ui, struct directory *cwd)
         }
         menu_append(ui->menu, entry->d_name, colors, bold);
     }
+    */
 }

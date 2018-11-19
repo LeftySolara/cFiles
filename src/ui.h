@@ -23,6 +23,7 @@
 #ifndef UI_H
 #define UI_H
 
+#include "filesystem.h"
 #include <ncurses.h>
 
 struct directory;
@@ -54,25 +55,26 @@ struct ui {
     WINDOW *main_window_sub;
     struct menu *menu;
 
+    int changed;
     const int color_enabled;
 };
 
-struct ui *setup_ui();
+struct ui *setup_ui(struct dir_list *dir_list);
 struct menu *setup_menu();
 struct menu_item *setup_menu_item(char *text, enum color_pair colors, int bold);
 
 void setup_ncurses();
-void setup_main_window(struct ui *ui);
+void setup_main_window(struct ui *ui, struct dir_list *dir_list);
 
 void teardown_ui(struct ui *ui);
 void teardown_menu(struct menu *menu);
 void teardown_menu_item(struct menu_item *item);
 void teardown_main_window(struct ui *ui);
 
-void refresh_ui(struct ui *ui);
+void refresh_ui(struct ui *ui, struct dir_list *dir_list);
 
 void print_path(struct ui *ui, char *path);
-void print_menu(struct ui *ui);
+void print_menu(struct ui *ui, struct dir_list *dir_list);
 
 void menu_move_up(struct menu *menu);
 void menu_move_down(struct menu *menu);
