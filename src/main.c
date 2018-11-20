@@ -50,8 +50,7 @@ int main()
     while (cmd != CMD_QUIT) {
         ch = getch();
         cmd = find_command(ch);
-        /* execute_command(cmd, cwd, ui); */
-
+        execute_command(cmd, directory_list, ui);
         refresh_ui(ui, directory_list);
     }
 

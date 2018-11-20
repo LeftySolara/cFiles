@@ -153,6 +153,24 @@ unsigned char resolve_symlink_type(struct dir_entry *entry, char *path)
     return entry->type;
 }
 
+void select_prev(struct dir_list *list)
+{
+    if (list->selected_entry->prev) {
+        list->selected_entry->highlight = 0;
+        list->selected_entry = list->selected_entry->prev;
+        list->selected_entry->highlight = 1;
+    }
+}
+
+void select_next(struct dir_list *list)
+{
+    if (list->selected_entry->next) {
+        list->selected_entry->highlight = 0;
+        list->selected_entry = list->selected_entry->next;
+        list->selected_entry->highlight = 1;
+    }
+}
+
 /*
 struct directory *get_dir(char *path)
 {

@@ -64,6 +64,9 @@ void dir_list_append(struct dir_list *list, char *name, unsigned char type, int 
 void get_entries(struct dir_list *list, char *path);
 unsigned char resolve_symlink_type(struct dir_entry *entry, char *path);
 
+void select_prev(struct dir_list *list);
+void select_next(struct dir_list *list);
+
 /*struct directory *get_dir(char *path); */
 /* void free_dir(struct directory *directory); */
 

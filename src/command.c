@@ -61,13 +61,15 @@ int execute_command(enum command_type cmd_type, struct dir_list *dir_list, struc
         /* open_entry(cwd, cwd->entries[ui->menu->idx_selected], ui); */
         /* menu_update_entries(ui, cwd); */
         print_path(ui, dir_list->path);
-        refresh_ui(ui, dir_list);
+        ui->changed = 1;
         break;
     case CMD_MENU_MOVE_UP:
-        menu_move_up(ui->menu);
+        select_prev(dir_list);
+        ui->changed = 1;
         break;
     case CMD_MENU_MOVE_DOWN:
-        menu_move_down(ui->menu);
+        select_next(dir_list);
+        ui->changed = 1;
         break;
     default:
         break;
