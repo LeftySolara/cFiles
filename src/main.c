@@ -34,7 +34,8 @@
 int main()
 {
     struct dir_list *directory_list = dir_list_init();
-    get_entries(directory_list, ".");
+    getcwd(directory_list->path, PATH_MAX);
+    get_entries(directory_list, directory_list->path);
 
     struct ui *ui = setup_ui(directory_list);
     /* struct directory *cwd = get_dir("."); */
