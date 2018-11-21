@@ -236,7 +236,17 @@ struct dir_entry *merge(struct dir_entry *first, struct dir_entry *second)
     if (!second)
         return first;
 
-    if (tolower(first->name[0]) < tolower(second->name[0])) {
+    int i = 0;
+    char first_char = tolower(first->name[i]);
+    char second_char = tolower(second->name[i]);
+
+    while (first_char == second_char) {
+        ++i;
+        first_char = tolower(first->name[i]);
+        second_char = tolower(second->name[i]);
+    }
+
+    if (first_char < second_char) {
         first->next = merge(first->next, second);
         first->next->prev = first;
         first->prev = NULL;
