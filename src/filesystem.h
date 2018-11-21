@@ -71,5 +71,8 @@ void select_next(struct dir_list *list);
 /* void free_dir(struct directory *directory); */
 
 /* void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui); */
+struct dir_entry *merge(struct dir_entry *first, struct dir_entry *second);
+struct dir_entry *mergesort(struct dir_entry *head);
+struct dir_entry *split(struct dir_entry *head);
 
 #endif /* FILESYSTEM_H */

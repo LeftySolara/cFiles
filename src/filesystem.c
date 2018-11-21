@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <ctype.h>
 #include <dirent.h>
 // #include <unistd.h>
 #include <sys/stat.h>
@@ -110,7 +111,6 @@ void dir_list_append(struct dir_list *list, char *name, unsigned char type,
 
 void get_entries(struct dir_list *list, char *path)
 {
-    /* TODO: sort entries alphabetically */
     DIR *dp;
     struct dirent *ent;
     /* enum color_pair colors = PAIR_NORMAL; */
@@ -130,6 +130,7 @@ void get_entries(struct dir_list *list, char *path)
             dir_list_append(list, ent->d_name, ent->d_type, 0, 0);
         }
         closedir(dp);
+        mergesort(list->head);
     }
     /* TODO: Handle directory not opening */
 }
@@ -227,3 +228,52 @@ void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui)
 }
 
 */
+
+struct dir_entry *merge(struct dir_entry *first, struct dir_entry *second)
+{
+    if (!first)
+        return second;
+    if (!second)
+        return first;
+
+    if (tolower(first->name[0]) < tolower(second->name[0])) {
+        first->next = merge(first->next, second);
+        first->next->prev = first;
+        first->prev = NULL;
+        return first;
+    }
+    else {
+        second->next = merge(first, second->next);
+        second->next->prev = second;
+        second->prev = NULL;
+        return second;
+    }
+}
+
+struct dir_entry *mergesort(struct dir_entry *head)
+{
+    if (!head || !head->next)
+        return head;
+    struct dir_entry *second = split(head);
+
+    head = mergesort(head);
+    second = mergesort(second);
+
+    return merge(head, second);
+}
+
+/* Split a list of entries into two halves. */
+struct dir_entry *split(struct dir_entry *head)
+{
+    struct dir_entry *fast = head;
+    struct dir_entry *slow = head;
+
+    while (fast->next && fast->next->next) {
+        fast = fast->next->next;
+        slow = slow->next;
+    }
+    struct dir_entry *temp = slow->next;
+    slow->next = NULL;
+
+    return temp;
+}
