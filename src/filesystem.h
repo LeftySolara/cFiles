@@ -62,6 +62,7 @@ void dir_list_free(struct dir_list *list);
 void dir_list_append(struct dir_list *list, char *name, unsigned char type, int highlight, int bold);
 
 void get_entries(struct dir_list *list, char *path);
+void reset_selected(struct dir_list *list);
 unsigned char resolve_symlink_type(struct dir_entry *entry, char *path);
 
 void select_prev(struct dir_list *list);

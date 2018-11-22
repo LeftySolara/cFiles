@@ -131,8 +131,21 @@ void get_entries(struct dir_list *list, char *path)
         }
         closedir(dp);
         list->head = mergesort(list->head);
+        reset_selected(list);
     }
     /* TODO: Handle directory not opening */
+}
+
+void reset_selected(struct dir_list *list)
+{
+    list->selected_entry = list->head;
+    list->selected_entry->highlight = 1;
+
+    struct dir_entry *current = list->selected_entry->next;
+    while (current) {
+        current->highlight = 0;
+        current = current->next;
+    }
 }
 
 /* Determint the type of file that a symlink points to. */
