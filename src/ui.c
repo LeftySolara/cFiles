@@ -160,52 +160,52 @@ void print_menu(struct ui *ui, struct dir_list *dir_list)
     WINDOW *target_win = ui->main_window_sub;
     wclear(target_win);
 
-    int i = 0;
-    struct dir_entry *current = dir_list->head;
-    while (current) {
+    int y = 0;
+    int bold = 0;
+    int selected = 0;
+    enum color_pair colors = PAIR_NORMAL;
+    struct dir_entry *entry = dir_list->head;
+
+    while (entry) {
+        selected = (entry == dir_list->selected_entry);
+
+        switch (entry->type) {
+        case DT_REG:
+            bold = (entry->is_executable == 0);
+            colors = (entry->is_executable) ? PAIR_NORMAL : PAIR_EXECUTABLE;
+            break;
+        case DT_DIR:
+            bold = 1;
+            colors = PAIR_DIR;
+            break;
+        case DT_LNK:  /* Symlinks to files that aren't directories */
+            bold = 0;
+            colors = PAIR_SYMLINK;
+            break;
+        default:
+            bold = 0;
+            colors = PAIR_NORMAL;
+            break;
+        }
+
         if (ui->color_enabled)
-            wattron(target_win, COLOR_PAIR(PAIR_NORMAL));
-        if (current->bold)
+            wattron(target_win, COLOR_PAIR(colors));
+        if (bold)
             wattr_on(target_win, A_BOLD, NULL);
-        if (current->highlight)
+        if (selected)
             wattr_on(target_win, A_STANDOUT, NULL);
 
-        mvwaddstr(target_win, i++, 0, current->name);
+        mvwaddstr(target_win, y++, 0, entry->name);
 
         if (ui->color_enabled)
-            wattroff(target_win, COLOR_PAIR(PAIR_NORMAL));
-        if (current->bold)
+            wattroff(target_win, COLOR_PAIR(colors));
+        if (bold)
             wattr_off(target_win, A_BOLD, NULL);
-        if (current->highlight)
+        if (selected)
             wattr_off(target_win, A_STANDOUT, NULL);
 
-        current = current->next;
+        entry = entry->next;
     }
-    /*
-    WINDOW *target_win = ui->main_window_sub;
-    struct menu_item *item;
-    wclear(target_win);
-
-    for (int i = 0; i < ui->menu->num_items; ++i) {
-        item = ui->menu->items[i];
-
-        if (ui->color_enabled)
-            wattron(target_win, COLOR_PAIR(item->colors));
-        if (item->is_bold)
-            wattr_on(target_win, A_BOLD, NULL);
-        if (i == ui->menu->idx_selected)
-            wattr_on(target_win, A_STANDOUT, NULL);
-
-        mvwaddstr(target_win, i, 0, item->display_text);
-
-        if (ui->color_enabled)
-            wattroff(target_win, COLOR_PAIR(item->colors));
-        if (item->is_bold)
-            wattr_off(target_win, A_BOLD, NULL);
-        if (i == ui->menu->idx_selected)
-            wattr_off(target_win, A_STANDOUT, NULL);
-    }
-    */
 }
 
 void menu_move_up(struct menu *menu)

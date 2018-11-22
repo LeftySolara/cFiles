@@ -36,10 +36,8 @@ struct directory {
 struct dir_entry {
     char *name;
     unsigned char type;
-
-    int highlight;
-    int bold;
-    /* enum color_pair colors; */
+    int is_executable;
+    int is_symlink;
 
     struct dir_entry *prev;
     struct dir_entry *next;
@@ -59,11 +57,10 @@ struct dir_list *dir_list_init();
 void dir_entry_free(struct dir_entry *entry);
 void dir_list_free(struct dir_list *list);
 
-void dir_list_append(struct dir_list *list, char *name, unsigned char type, int highlight, int bold);
+void dir_list_append(struct dir_list *list, char *name, unsigned char type, int executable, int symlink);
 
 void get_entries(struct dir_list *list, char *path);
-void reset_selected(struct dir_list *list);
-unsigned char resolve_symlink_type(struct dir_entry *entry, char *path);
+unsigned char resolve_symlink_type(struct dirent *entry, char *path);
 
 void select_prev(struct dir_list *list);
 void select_next(struct dir_list *list);

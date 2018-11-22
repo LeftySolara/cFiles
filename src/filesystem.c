@@ -26,6 +26,7 @@
 #include <limits.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <unistd.h>
 // #include <unistd.h>
 #include <sys/stat.h>
 
@@ -38,9 +39,6 @@ struct dir_entry *dir_entry_init()
     entry->name = calloc(256, sizeof(char));
     entry->name[0] = '\0';
     entry->type = DT_UNKNOWN;
-
-    entry->highlight = 0;
-    entry->bold = 0;
 
     entry->prev = NULL;
     entry->next = NULL;
@@ -84,19 +82,18 @@ void dir_list_free(struct dir_list *list)
 }
 
 void dir_list_append(struct dir_list *list, char *name, unsigned char type,
-                     int highlight, int bold)
+                     int executable, int symlink)
 {
     struct dir_entry *entry = dir_entry_init();
 
     strcpy(entry->name, name);
     entry->type = type;
-    entry->highlight = highlight;
-    entry->bold = bold;
+    entry->is_executable = executable;
+    entry->is_symlink = symlink;
 
     if (!list->head) {
         list->head = entry;
         list->selected_entry = list->head;
-        list->selected_entry->highlight = 1;
     }
     else {
         struct dir_entry *current = list->head;
@@ -115,74 +112,53 @@ void get_entries(struct dir_list *list, char *path)
     struct dirent *ent;
     /* enum color_pair colors = PAIR_NORMAL; */
 
+    int is_executable;
+    int is_symlink;
     if ((dp = opendir(path)) != NULL) {
         strcpy(list->path, path);
         while ((ent = readdir(dp)) != NULL) {
-            /*
-            if (ent->d_type == DT_LNK)
-                colors = PAIR_SYMLINK;
-            else if (ent->d_type == DT_DIR)
-                colors = PAIR_DIR;
-            else
-                colors = PAIR_NORMAL;
-            */
+            is_executable = access(ent->d_name, X_OK);
+            is_symlink = (ent->d_type == DT_LNK);
+            ent->d_type = resolve_symlink_type(ent, path);
 
-            dir_list_append(list, ent->d_name, ent->d_type, 0, 0);
+            dir_list_append(list, ent->d_name, ent->d_type, is_executable, is_symlink);
         }
         closedir(dp);
         list->head = mergesort(list->head);
-        reset_selected(list);
+        list->selected_entry = list->head;
     }
     /* TODO: Handle directory not opening */
 }
 
-void reset_selected(struct dir_list *list)
+/* Determine the type of file that a symlink points to. */
+unsigned char resolve_symlink_type(struct dirent *entry, char *path)
 {
-    list->selected_entry = list->head;
-    list->selected_entry->highlight = 1;
-
-    struct dir_entry *current = list->selected_entry->next;
-    while (current) {
-        current->highlight = 0;
-        current = current->next;
-    }
-}
-
-/* Determint the type of file that a symlink points to. */
-unsigned char resolve_symlink_type(struct dir_entry *entry, char *path)
-{
-    if (entry->type != DT_LNK)
-        return entry->type;
+    if (entry->d_type != DT_LNK)
+        return entry->d_type;
 
     char full_path[PATH_MAX + 1];
 
     strcpy(full_path, path);
     strcpy(full_path, "/");
-    strcpy(full_path, entry->name);
+    strcpy(full_path, entry->d_name);
 
     struct stat sb;
     if (stat(full_path, &sb) == 0 && S_ISDIR(sb.st_mode))
         return DT_DIR;
 
-    return entry->type;
+    return entry->d_type;
 }
 
 void select_prev(struct dir_list *list)
 {
-    if (list->selected_entry->prev) {
-        list->selected_entry->highlight = 0;
+    if (list->selected_entry->prev)
         list->selected_entry = list->selected_entry->prev;
-        list->selected_entry->highlight = 1;
-    }
 }
 
 void select_next(struct dir_list *list)
 {
-    if (list->selected_entry->next) {
-        list->selected_entry->highlight = 0;
+    if (list->selected_entry->next)
         list->selected_entry = list->selected_entry->next;
-        list->selected_entry->highlight = 1;
-    }
 }
 
 /*
