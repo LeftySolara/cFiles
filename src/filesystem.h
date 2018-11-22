@@ -60,6 +60,7 @@ void dir_list_free(struct dir_list *list);
 void dir_list_append(struct dir_list *list, char *name, unsigned char type, int executable, int symlink);
 
 void get_entries(struct dir_list *list, char *path);
+void clear_entries(struct dir_list *list);
 unsigned char resolve_symlink_type(struct dirent *entry, char *path);
 
 void select_prev(struct dir_list *list);
@@ -68,6 +69,7 @@ void select_next(struct dir_list *list);
 /*struct directory *get_dir(char *path); */
 /* void free_dir(struct directory *directory); */
 
+void open_selected_entry(struct dir_list *list);
 /* void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui); */
 struct dir_entry *merge(struct dir_entry *first, struct dir_entry *second);
 struct dir_entry *mergesort(struct dir_entry *head);

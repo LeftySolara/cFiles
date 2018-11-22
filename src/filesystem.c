@@ -130,6 +130,21 @@ void get_entries(struct dir_list *list, char *path)
     /* TODO: Handle directory not opening */
 }
 
+void clear_entries(struct dir_list *list)
+{
+    struct dir_entry *current = list->head;
+
+    while (current) {
+        list->head = current ->next;
+        dir_entry_free(current);
+        current = list->head;
+    }
+
+    list->head = NULL;
+    list->selected_entry = NULL;
+    list->num_entries = 0;
+}
+
 /* Determine the type of file that a symlink points to. */
 unsigned char resolve_symlink_type(struct dirent *entry, char *path)
 {
@@ -217,6 +232,33 @@ void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui)
 }
 
 */
+
+void open_selected_entry(struct dir_list *list)
+{
+    struct dir_entry *target = list->selected_entry;
+    char new_path[PATH_MAX];
+
+    strcpy(new_path, list->path);
+    if (target->type == DT_DIR) {
+        if (strcmp(target->name, ".") == 0)
+            return;
+        else if (strcmp(target->name, "..") == 0) {
+            char *last_slash = strrchr(new_path, '/');
+            *last_slash = '\0';
+        }
+        else {
+            strcat(new_path, "/");
+            strcat(new_path, target->name);
+        }
+
+        /* Prevent attempting to go higher than the system root directory. */
+        if (strcmp(new_path, "") == 0)
+            strcpy(new_path, "/");
+
+        clear_entries(list);
+        get_entries(list, new_path);
+    }
+}
 
 struct dir_entry *merge(struct dir_entry *first, struct dir_entry *second)
 {

@@ -58,8 +58,7 @@ int execute_command(enum command_type cmd_type, struct dir_list *dir_list, struc
     case CMD_NONE:
         break;
     case CMD_MENU_SELECT:
-        /* open_entry(cwd, cwd->entries[ui->menu->idx_selected], ui); */
-        /* menu_update_entries(ui, cwd); */
+        open_selected_entry(dir_list);
         print_path(ui, dir_list->path);
         ui->changed = 1;
         break;
