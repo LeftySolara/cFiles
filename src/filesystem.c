@@ -130,7 +130,7 @@ void get_entries(struct dir_list *list, char *path)
             dir_list_append(list, ent->d_name, ent->d_type, 0, 0);
         }
         closedir(dp);
-        mergesort(list->head);
+        list->head = mergesort(list->head);
     }
     /* TODO: Handle directory not opening */
 }
