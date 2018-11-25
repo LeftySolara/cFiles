@@ -38,6 +38,7 @@ struct dir_entry {
     unsigned char type;
     int is_executable;
     int is_symlink;
+    int is_hidden_file;
 
     struct dir_entry *prev;
     struct dir_entry *next;
@@ -57,19 +58,19 @@ struct dir_list *dir_list_init();
 void dir_entry_free(struct dir_entry *entry);
 void dir_list_free(struct dir_list *list);
 
-void dir_list_append(struct dir_list *list, char *name, unsigned char type, int executable, int symlink);
+void dir_list_append(struct dir_list *list, char *name, unsigned char type, int executable, int symlink, int hidden);
 
-void get_entries(struct dir_list *list, char *path);
+void get_entries(struct dir_list *list, char *path, int select_current);
 void clear_entries(struct dir_list *list);
 unsigned char resolve_symlink_type(struct dirent *entry, char *path);
 
-void select_prev(struct dir_list *list);
-void select_next(struct dir_list *list);
+void select_prev(struct dir_list *list, int skip_hidden);
+void select_next(struct dir_list *list, int skip_hidden);
 
 /*struct directory *get_dir(char *path); */
 /* void free_dir(struct directory *directory); */
 
-void open_selected_entry(struct dir_list *list);
+void open_selected_entry(struct dir_list *list, int select_current);
 /* void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui); */
 struct dir_entry *merge(struct dir_entry *first, struct dir_entry *second);
 struct dir_entry *mergesort(struct dir_entry *head);

@@ -47,6 +47,7 @@ struct menu {
     int idx_selected;
     unsigned int num_items;
     unsigned int max_items;
+    int show_hidden;
     int changed;
 };
 

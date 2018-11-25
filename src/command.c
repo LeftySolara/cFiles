@@ -30,7 +30,8 @@
 static struct command cmds[] = {
 
     {CMD_NONE, {0, 0, 0}},
-    {CMD_MENU_SELECT, {KEY_RETURN, 0, 0}},
+    {CMD_MENU_SELECT, {KEY_RETURN, 'l', KEY_RIGHT}},
+    {CMD_MENU_SELECT_PARENT, {'h', KEY_LEFT, 0}},
     {CMD_MENU_MOVE_UP, {'k', KEY_UP, 0}},
     {CMD_MENU_MOVE_DOWN, {'j', KEY_DOWN, 0}},
     {CMD_QUIT, {'q', KEY_CTRL('c'), 0}},
@@ -58,16 +59,22 @@ int execute_command(enum command_type cmd_type, struct dir_list *dir_list, struc
     case CMD_NONE:
         break;
     case CMD_MENU_SELECT:
-        open_selected_entry(dir_list);
+        open_selected_entry(dir_list, ui->menu->show_hidden);
+        print_path(ui, dir_list->path);
+        ui->changed = 1;
+        break;
+    case CMD_MENU_SELECT_PARENT:
+        dir_list->selected_entry = dir_list->head->next;
+        open_selected_entry(dir_list, ui->menu->show_hidden);
         print_path(ui, dir_list->path);
         ui->changed = 1;
         break;
     case CMD_MENU_MOVE_UP:
-        select_prev(dir_list);
+        select_prev(dir_list, !ui->menu->show_hidden);
         ui->changed = 1;
         break;
     case CMD_MENU_MOVE_DOWN:
-        select_next(dir_list);
+        select_next(dir_list, !ui->menu->show_hidden);
         ui->changed = 1;
         break;
     default:

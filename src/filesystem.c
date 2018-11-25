@@ -40,6 +40,10 @@ struct dir_entry *dir_entry_init()
     entry->name[0] = '\0';
     entry->type = DT_UNKNOWN;
 
+    entry->is_executable = 0;
+    entry->is_symlink = 0;
+    entry->is_hidden_file = 0;
+
     entry->prev = NULL;
     entry->next = NULL;
 
@@ -82,7 +86,7 @@ void dir_list_free(struct dir_list *list)
 }
 
 void dir_list_append(struct dir_list *list, char *name, unsigned char type,
-                     int executable, int symlink)
+                     int executable, int symlink, int hidden)
 {
     struct dir_entry *entry = dir_entry_init();
 
@@ -90,6 +94,7 @@ void dir_list_append(struct dir_list *list, char *name, unsigned char type,
     entry->type = type;
     entry->is_executable = executable;
     entry->is_symlink = symlink;
+    entry->is_hidden_file = hidden;
 
     if (!list->head) {
         list->head = entry;
@@ -106,7 +111,7 @@ void dir_list_append(struct dir_list *list, char *name, unsigned char type,
     ++list->num_entries;
 }
 
-void get_entries(struct dir_list *list, char *path)
+void get_entries(struct dir_list *list, char *path, int select_current)
 {
     DIR *dp;
     struct dirent *ent;
@@ -114,19 +119,27 @@ void get_entries(struct dir_list *list, char *path)
 
     int is_executable;
     int is_symlink;
+    int is_hidden_file;
     if ((dp = opendir(path)) != NULL) {
         strcpy(list->path, path);
         while ((ent = readdir(dp)) != NULL) {
             is_executable = access(ent->d_name, X_OK);
             is_symlink = (ent->d_type == DT_LNK);
+            is_hidden_file = (ent->d_name[0] == '.');
             if (is_symlink)
                 ent->d_type = resolve_symlink_type(ent, path);
 
-            dir_list_append(list, ent->d_name, ent->d_type, is_executable, is_symlink);
+            dir_list_append(list, ent->d_name, ent->d_type, is_executable, is_symlink, is_hidden_file);
         }
         closedir(dp);
         list->head = mergesort(list->head);
-        list->selected_entry = list->head;
+
+        if (select_current)
+            list->selected_entry = list->head;
+        else {
+            while (list->selected_entry->is_hidden_file && list->selected_entry->next)
+                list->selected_entry = list->selected_entry->next;
+        }
     }
     /* TODO: Handle directory not opening */
 }
@@ -165,16 +178,52 @@ unsigned char resolve_symlink_type(struct dirent *entry, char *path)
     return entry->d_type;
 }
 
-void select_prev(struct dir_list *list)
+void select_prev(struct dir_list *list, int skip_hidden)
 {
-    if (list->selected_entry->prev)
-        list->selected_entry = list->selected_entry->prev;
+    struct dir_entry *current = list->selected_entry;
+
+    if (!current->prev)
+        return;
+
+    if (skip_hidden) {
+
+        struct dir_entry *last_non_hidden = current;
+        while (current != list->head->next && current->prev) {
+            current = current->prev;
+            if (!current->is_hidden_file) {
+                last_non_hidden = current;
+                break;
+            }
+        }
+        list->selected_entry = last_non_hidden;
+    }
+    else
+        list->selected_entry = current->prev;
+
+    /*
+    do {
+        if (skip_hidden && !strcmp(current->prev->name, ".."))
+            break;
+        current = current->prev;
+    } while (skip_hidden && current->is_hidden_file && current->prev);
+
+    list->selected_entry = current;
+    */
+
 }
 
-void select_next(struct dir_list *list)
+void select_next(struct dir_list *list, int skip_hidden)
 {
-    if (list->selected_entry->next)
-        list->selected_entry = list->selected_entry->next;
+    struct dir_entry *current = list->selected_entry;
+
+    if (!current->next)
+        return;
+
+    do {
+        current = current->next;
+    } while (skip_hidden && current->is_hidden_file && current->next);
+
+    list->selected_entry = current;
 }
 
 /*
@@ -234,7 +283,7 @@ void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui)
 
 */
 
-void open_selected_entry(struct dir_list *list)
+void open_selected_entry(struct dir_list *list, int select_current)
 {
     struct dir_entry *target = list->selected_entry;
     char new_path[PATH_MAX];
@@ -257,7 +306,7 @@ void open_selected_entry(struct dir_list *list)
             strcpy(new_path, "/");
 
         clear_entries(list);
-        get_entries(list, new_path);
+        get_entries(list, new_path, select_current);
     }
 }
 

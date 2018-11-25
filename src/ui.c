@@ -46,6 +46,7 @@ struct menu *setup_menu()
     menu->idx_selected = -1;  /* no item selected */
     menu->num_items = 0;
     menu->max_items = 255;
+    menu->show_hidden = 0;
     menu->changed = 1;
 
     return menu;
@@ -167,6 +168,11 @@ void print_menu(struct ui *ui, struct dir_list *dir_list)
     struct dir_entry *entry = dir_list->head;
 
     while (entry) {
+        if (entry->is_hidden_file && !ui->menu->show_hidden) {
+            entry = entry->next;
+            continue;
+        }
+
         selected = (entry == dir_list->selected_entry);
 
         switch (entry->type) {
