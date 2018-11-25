@@ -119,7 +119,8 @@ void get_entries(struct dir_list *list, char *path)
         while ((ent = readdir(dp)) != NULL) {
             is_executable = access(ent->d_name, X_OK);
             is_symlink = (ent->d_type == DT_LNK);
-            ent->d_type = resolve_symlink_type(ent, path);
+            if (is_symlink)
+                ent->d_type = resolve_symlink_type(ent, path);
 
             dir_list_append(list, ent->d_name, ent->d_type, is_executable, is_symlink);
         }
@@ -154,8 +155,8 @@ unsigned char resolve_symlink_type(struct dirent *entry, char *path)
     char full_path[PATH_MAX + 1];
 
     strcpy(full_path, path);
-    strcpy(full_path, "/");
-    strcpy(full_path, entry->d_name);
+    strcat(full_path, "/");
+    strcat(full_path, entry->d_name);
 
     struct stat sb;
     if (stat(full_path, &sb) == 0 && S_ISDIR(sb.st_mode))

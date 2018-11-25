@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 project(cfiles)
 
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -O0")
+set(CMAKE_CXX_FLAGS_DEBUG "-g3 -Wall -O0")
 set(CMAKE_BUILD_TYPE Debug)
 
 set(CFILES_VERSION_MAJOR 0)

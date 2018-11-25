@@ -176,7 +176,7 @@ void print_menu(struct ui *ui, struct dir_list *dir_list)
             break;
         case DT_DIR:
             bold = 1;
-            colors = PAIR_DIR;
+            colors = (entry->is_symlink) ? PAIR_SYMLINK : PAIR_DIR;
             break;
         case DT_LNK:  /* Symlinks to files that aren't directories */
             bold = 0;
