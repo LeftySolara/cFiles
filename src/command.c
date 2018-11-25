@@ -34,6 +34,7 @@ static struct command cmds[] = {
     {CMD_MENU_SELECT_PARENT, {'h', KEY_LEFT, 0}},
     {CMD_MENU_MOVE_UP, {'k', KEY_UP, 0}},
     {CMD_MENU_MOVE_DOWN, {'j', KEY_DOWN, 0}},
+    {CMD_TOGGLE_HIDDEN, {KEY_BACKSPACE, 0, 0}},
     {CMD_QUIT, {'q', KEY_CTRL('c'), 0}},
 };
 
@@ -75,6 +76,13 @@ int execute_command(enum command_type cmd_type, struct dir_list *dir_list, struc
         break;
     case CMD_MENU_MOVE_DOWN:
         select_next(dir_list, !ui->menu->show_hidden);
+        ui->changed = 1;
+        break;
+    case CMD_TOGGLE_HIDDEN:
+        if (ui->menu->show_hidden)
+            ui->menu->show_hidden = 0;
+        else
+            ui->menu->show_hidden = 1;
         ui->changed = 1;
         break;
     default:

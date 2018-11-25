@@ -34,6 +34,7 @@ enum command_type {
     CMD_MENU_SELECT_PARENT,
     CMD_MENU_MOVE_UP,
     CMD_MENU_MOVE_DOWN,
+    CMD_TOGGLE_HIDDEN,
     CMD_QUIT,
     NUM_CMDS
 };
