@@ -38,9 +38,6 @@ int main()
     get_entries(directory_list, directory_list->path, 0);
 
     struct ui *ui = setup_ui(directory_list);
-    /* struct directory *cwd = get_dir("."); */
-
-    /* menu_update_entries(ui, cwd); */
     print_path(ui, directory_list->path);
     print_menu(ui, directory_list);
     refresh_ui(ui, directory_list);

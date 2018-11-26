@@ -25,14 +25,6 @@
 
 #include <dirent.h>
 
-/*
-struct directory {
-    char *path;
-    int num_entries;
-    struct dirent **entries;
-};
-*/
-
 struct dir_entry {
     char *name;
     unsigned char type;
@@ -62,17 +54,15 @@ void dir_list_append(struct dir_list *list, char *name, unsigned char type, int 
 
 void get_entries(struct dir_list *list, char *path, int select_current);
 void clear_entries(struct dir_list *list);
+
 unsigned char resolve_symlink_type(struct dirent *entry, char *path);
 
 void select_prev(struct dir_list *list, int skip_hidden);
 void select_next(struct dir_list *list, int skip_hidden);
 void select_first_non_hidden(struct dir_list *list);
 
-/*struct directory *get_dir(char *path); */
-/* void free_dir(struct directory *directory); */
-
 void open_selected_entry(struct dir_list *list, int select_current);
-/* void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui); */
+
 struct dir_entry *merge(struct dir_entry *first, struct dir_entry *second);
 struct dir_entry *mergesort(struct dir_entry *head);
 struct dir_entry *split(struct dir_entry *head);

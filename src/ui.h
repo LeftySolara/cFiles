@@ -80,6 +80,5 @@ void print_menu(struct ui *ui, struct dir_list *dir_list);
 void menu_move_up(struct menu *menu);
 void menu_move_down(struct menu *menu);
 void menu_append(struct menu *menu, char *text, enum color_pair colors, int bold);
-void menu_update_entries(struct ui *ui, struct directory *cwd);
 
 #endif /* UI_H */

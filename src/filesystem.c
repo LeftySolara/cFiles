@@ -27,10 +27,7 @@
 #include <ctype.h>
 #include <dirent.h>
 #include <unistd.h>
-// #include <unistd.h>
 #include <sys/stat.h>
-
-/* static const int max_path_length = 4096; */
 
 struct dir_entry *dir_entry_init()
 {
@@ -198,17 +195,6 @@ void select_prev(struct dir_list *list, int skip_hidden)
     }
     else
         list->selected_entry = current->prev;
-
-    /*
-    do {
-        if (skip_hidden && !strcmp(current->prev->name, ".."))
-            break;
-        current = current->prev;
-    } while (skip_hidden && current->is_hidden_file && current->prev);
-
-    list->selected_entry = current;
-    */
-
 }
 
 void select_next(struct dir_list *list, int skip_hidden)
@@ -237,63 +223,6 @@ void select_first_non_hidden(struct dir_list *list)
         current = current->next;
     }
 }
-
-/*
-struct directory *get_dir(char *path)
-{
-    struct directory *directory = malloc(sizeof(struct directory));
-    directory->path = malloc(sizeof(char) * max_path_length);
-
-    directory->num_entries = scandir(path, &directory->entries, NULL, alphasort);
-    getcwd(directory->path, max_path_length);
-
-    return directory;
-}
-
-void free_dir(struct directory *directory)
-{
-    free(directory->entries);
-    free(directory->path);
-    free(directory);
-}
-
-void open_entry(struct directory *cwd, struct dirent *entry, struct ui *ui)
-{
-    unsigned entry_type = entry->d_type;
-
-    if (entry_type == DT_LNK) {
-        char full_path[PATH_MAX + 1];
-
-        strcpy(full_path, cwd->path);
-        strcat(full_path, "/");
-        strcat(full_path, entry->d_name);
-
-        struct stat sb;
-        if (stat(full_path, &sb) == 0 && S_ISDIR(sb.st_mode))
-            entry_type = DT_DIR;
-    }
-    if (entry_type == DT_DIR) {
-        if (strcmp(entry->d_name, ".") == 0)
-            return;
-        else if (strcmp(entry->d_name, "..") == 0) {
-            char *last_slash = strrchr(cwd->path, '/');
-            *last_slash = '\0';
-        }
-        else {
-            strcat(cwd->path, "/");
-            strcat(cwd->path, entry->d_name);
-        }
-
-        if (strcmp(cwd->path, "") == 0)
-            strcpy(cwd->path, "/");
-
-        free(cwd->entries);
-        cwd->num_entries = scandir(cwd->path, &cwd->entries, NULL, alphasort);
-        ui->menu->idx_selected = 0;
-    }
-}
-
-*/
 
 void open_selected_entry(struct dir_list *list, int select_current)
 {
