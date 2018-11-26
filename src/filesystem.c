@@ -136,11 +136,10 @@ void get_entries(struct dir_list *list, char *path, int select_current)
 
         if (select_current)
             list->selected_entry = list->head;
-        else {
-            while (list->selected_entry->is_hidden_file && list->selected_entry->next)
-                list->selected_entry = list->selected_entry->next;
-        }
+        else
+            select_first_non_hidden(list);
     }
+
     /* TODO: Handle directory not opening */
 }
 
@@ -224,6 +223,19 @@ void select_next(struct dir_list *list, int skip_hidden)
     } while (skip_hidden && current->is_hidden_file && current->next);
 
     list->selected_entry = current;
+}
+
+void select_first_non_hidden(struct dir_list *list)
+{
+    struct dir_entry *current = list->head;
+
+    while (current) {
+        if (current->is_hidden_file == 0) {
+            list->selected_entry = current;
+            return;
+        }
+        current = current->next;
+    }
 }
 
 /*

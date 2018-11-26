@@ -66,6 +66,7 @@ unsigned char resolve_symlink_type(struct dirent *entry, char *path);
 
 void select_prev(struct dir_list *list, int skip_hidden);
 void select_next(struct dir_list *list, int skip_hidden);
+void select_first_non_hidden(struct dir_list *list);
 
 /*struct directory *get_dir(char *path); */
 /* void free_dir(struct directory *directory); */

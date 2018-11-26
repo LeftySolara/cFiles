@@ -79,8 +79,11 @@ int execute_command(enum command_type cmd_type, struct dir_list *dir_list, struc
         ui->changed = 1;
         break;
     case CMD_TOGGLE_HIDDEN:
-        if (ui->menu->show_hidden)
+        if (ui->menu->show_hidden) {
             ui->menu->show_hidden = 0;
+            if (dir_list->selected_entry->is_hidden_file)
+                select_first_non_hidden(dir_list);
+        }
         else
             ui->menu->show_hidden = 1;
         ui->changed = 1;
